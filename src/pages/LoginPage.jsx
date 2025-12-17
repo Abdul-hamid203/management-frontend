@@ -40,16 +40,15 @@ import { FaEnvelope, FaLock, FaUserCircle } from "react-icons/fa";
 import {useAuth} from "../Contexts/AuthContext.jsx";
 
 const LoginPage = () => {
+    const { login } = useAuth();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-        const { login } = useAuth();
-        const [email, setEmail] = useState("");
-        const [password, setPassword] = useState("");
-
-        const handleSubmit = async (e) => {
-            e.preventDefault();
-            if (!email || !password) return; // simple validation
-            await login(email, password); // calls AuthContext login
-        };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!email || !password) return; // simple validation
+        await login(email, password); // calls AuthContext login
+    };
     return (
         <div className="page-wrapper">
 

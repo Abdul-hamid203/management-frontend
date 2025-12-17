@@ -8,6 +8,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import ProtectedRoute from "./Routes/ProtectedRoutes.jsx";
 import AdminLayout from "./Layouts/AdminLayout.jsx";
 import {AuthProvider} from "./Contexts/AuthContext.jsx";
+import StorePage from "./pages/StorePage.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -16,11 +17,15 @@ function App() {
     <>
         <Routes>
             <Route path="/" element={<LoginPage/>}></Route>
+            <Route path="/see" element={<StorePage/>}></Route>
             {/* Customer routes */}
             <Route element={<ProtectedRoute allowedRole="cashier" />}>
                 <Route path="/cashier" element={<AdminLayout />}>
                     <Route index element={<POS />} />
                 </Route>
+            </Route>
+            <Route element={<AdminLayout />}>
+
             </Route>
         </Routes>
     </>
