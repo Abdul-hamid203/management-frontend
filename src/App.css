@@ -329,3 +329,38 @@ h4 {
     border-radius: 8px;
     padding: 10px 16px;
 }
+
+/*profile*/
+.profile-settings-container {
+    padding: 40px 0;
+}
+
+.settings-card {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #6366f1, #3b82f6);
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.password-rules {
+    list-style: none;
+    padding-left: 0;
+}
+
+.password-rules li {
+    font-size: 14px;
+    color: #198754;
+    margin-bottom: 4px;
+}

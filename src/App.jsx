@@ -13,6 +13,7 @@ import POSPage from "./pages/POSPage.jsx";
 import Login from "./pages/LoginPg.jsx";
 import Dashboard from "./pages/Dashbord.jsx";
 import BandManagement from "./pages/dmin.jsx";
+import ProfileSettings from "./pages/profile.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -22,6 +23,7 @@ function App() {
         <Routes>
             <Route path="/" element={<Login/>}></Route>
             <Route path="/d" element={<Dashboard/>}></Route>
+            <Route path="/dw" element={<ProfileSettings/>}></Route>
             <Route path="/dd" element={<BandManagement/>}></Route>
             <Route path="/see" element={<StorePage/>}></Route>
             <Route path="/pos" element={<POSPage/>}></Route>
