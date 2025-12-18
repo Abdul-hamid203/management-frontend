@@ -3,12 +3,16 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import {Route, Routes} from "react-router-dom";
-import POS from "./pages/POS.jsx";
+import POS from "./pages/POSPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import ProtectedRoute from "./Routes/ProtectedRoutes.jsx";
 import AdminLayout from "./Layouts/AdminLayout.jsx";
 import {AuthProvider} from "./Contexts/AuthContext.jsx";
 import StorePage from "./pages/StorePage.jsx";
+import POSPage from "./pages/POSPage.jsx";
+import Login from "./pages/LoginPg.jsx";
+import Dashboard from "./pages/Dashbord.jsx";
+import BandManagement from "./pages/dmin.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -16,8 +20,11 @@ function App() {
   return (
     <>
         <Routes>
-            <Route path="/" element={<LoginPage/>}></Route>
+            <Route path="/" element={<Login/>}></Route>
+            <Route path="/d" element={<Dashboard/>}></Route>
+            <Route path="/dd" element={<BandManagement/>}></Route>
             <Route path="/see" element={<StorePage/>}></Route>
+            <Route path="/pos" element={<POSPage/>}></Route>
             {/* Customer routes */}
             <Route element={<ProtectedRoute allowedRole="cashier" />}>
                 <Route path="/cashier" element={<AdminLayout />}>

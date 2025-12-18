@@ -317,7 +317,7 @@
 // export default POS;
 import React, { useState, useMemo } from "react";
 
-const POS = () => {
+const POSPage = () => {
     // Categories
     const categories = ["Brew", "Coffee", "Brewers", "Kettles", "Cups"];
 
@@ -550,8 +550,7 @@ Thank you!
 
             {/* PRODUCT MODAL */}
             {selectedProduct && (
-                <div className="modal fade show"
-                     style={{ display: "block", background: "rgba(0,0,0,0.5)" }}>
+                <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.5)" }}>
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
 
@@ -561,9 +560,13 @@ Thank you!
                             </div>
 
                             <div className="modal-body">
-                                <img src={selectedProduct.img} className="img-fluid rounded mb-2" />
+                                <div className="row">
+                                    <div className="col-12">
+                                        <img src={selectedProduct.img} className="img-fluid display-6 rounded mb-2" />
+                                    </div>
+                                </div>
                                 <p>{selectedProduct.desc}</p>
-                                <h5 className="text-primary">${selectedProduct.price}</h5>
+                                <h5 className="text-primary text-end">${selectedProduct.price}</h5>
                             </div>
 
                             <div className="modal-footer">
@@ -578,4 +581,4 @@ Thank you!
     );
 };
 
-export default POS;
+export default POSPage;

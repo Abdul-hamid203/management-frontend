@@ -137,3 +137,195 @@ h4 {
 }
 
 .cursor-pointer { cursor: pointer; }
+
+/*// login pge*/
+.login-wrapper {
+    min-height: 100vh;
+    background: url("./assets/restaurant.jpg") no-repeat center center/cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* Light overlay so bg remains visible */
+.login-wrapper::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+.login-card {
+    position: relative;
+    background: #ffffff;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px;
+    border-radius: 12px;
+    z-index: 1;
+}
+
+.logo {
+    width: 90px;
+}
+
+.form-control {
+    height: 45px;
+    border-radius: 8px;
+}
+
+.password-input {
+    padding-right: 45px;
+}
+
+.password-icon {
+    position: absolute;
+    right: 15px;
+    top: 43px;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+}
+
+.footer-text {
+    position: relative;
+    z-index: 1;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+/*dshbord*/
+.dashboard-container {
+    padding: 30px 40px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Cards */
+.dashboard-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Stat Icons */
+.stat-icon {
+    font-size: 22px;
+    color: #64748b;
+}
+
+/* Activity */
+.activity-item svg {
+    color: #64748b;
+    cursor: pointer;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #2563eb;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+/* Quick Actions */
+.action-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-item:hover {
+    background-color: #f1f5f9;
+}
+
+.action-icon {
+    font-size: 18px;
+    color: #2563eb;
+}
+
+/* Button */
+.btn-primary {
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+}
+
+/*dmini*/
+.band-container {
+    padding: 30px 40px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Cards */
+.band-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Stat icon */
+.stat-icon {
+    font-size: 22px;
+    color: #64748b;
+}
+
+/* Search */
+.search-box {
+    position: relative;
+}
+
+.search-box svg {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: #64748b;
+}
+
+.search-box input {
+    padding-left: 42px;
+    height: 44px;
+    border-radius: 10px;
+}
+
+/* Table Header */
+.table-header {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+    padding: 14px 0;
+    font-size: 14px;
+    color: #64748b;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 80px 0;
+    color: #64748b;
+}
+
+.empty-state svg {
+    color: #94a3b8;
+}
+
+/* Button */
+.btn-primary {
+    background-color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+}
