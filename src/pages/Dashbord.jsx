@@ -7,9 +7,13 @@ import {
     MusicNote,
     Eye,
 } from "react-bootstrap-icons";
+import HeaderComponent from "../components/HeaderComponent.jsx";
+import {useNavigate} from "react-router-dom";
 
 const Dashboard = () => {
     return (
+        <>
+        <HeaderComponent />
         <div className="dashboard-container container-fluid">
             {/* Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -90,15 +94,29 @@ const Dashboard = () => {
                                 Common tasks and shortcuts
                             </p>
 
-                            <Action label="Add New Slider" icon={<Image />} />
-                            <Action label="Create News Article" icon={<FileText />} />
-                            <Action label="Edit About Page" icon={<FileText />} />
-                            <Action label="Manage Services" icon={<Wrench />} />
+                            <div className="action-item d-flex align-items-center gap-3 mb-3" >
+                                <span className="action-icon">{<Image />}</span>
+                                <span className="fw-semibold">"View Stock"</span>
+                            </div>
+                            <div className="action-item d-flex align-items-center gap-3 mb-3" >
+                                <span className="action-icon">{<FileText />}</span>
+                                <span className="fw-semibold">"Create News Article"</span>
+                            </div>
+
+                            <div className="action-item d-flex align-items-center gap-3 mb-3" >
+                                <span className="action-icon">{<FileText />}</span>
+                                <span className="fw-semibold">"Edit About Page"</span>
+                            </div>
+                            <div className="action-item d-flex align-items-center gap-3 mb-3" >
+                                <span className="action-icon"><Wrench /></span>
+                                <span className="fw-semibold">"Manage Services"</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
@@ -130,11 +148,5 @@ const Activity = ({ title, time, dot }) => (
     </div>
 );
 
-const Action = ({ label, icon }) => (
-    <div className="action-item d-flex align-items-center gap-3 mb-3">
-        <span className="action-icon">{icon}</span>
-        <span className="fw-semibold">{label}</span>
-    </div>
-);
 
 export default Dashboard;

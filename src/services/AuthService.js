@@ -1,12 +1,12 @@
 import axios from "axios";
 
-const API_BASE = "https://api.example.com"; // Replace with your backend URL
+const API_BASE = "http://localhost:8069/api/v1"; // Replace with your backend URL
 
 export const authService = {
     // LOGIN
     login: async (email, password) => {
         try {
-            const response = await axios.post(`${API_BASE}/auth/login`, {
+            const response = await axios.post(`${API_BASE}/auth/signin`, {
                 email,
                 password,
             });
