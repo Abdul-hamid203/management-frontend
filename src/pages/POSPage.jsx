@@ -315,7 +315,275 @@
 // };
 //
 // export default POS;
+// import React, { useState, useMemo } from "react";
+//
+// const POSPage = () => {
+//     // Categories
+//     const categories = ["Brew", "Coffee", "Brewers", "Kettles", "Cups"];
+//
+//     // Sample product data
+//     const products = Array.from({ length: 20 }, (_, i) => ({
+//         id: i + 1,
+//         name: "Product " + (i + 1),
+//         price: (10 + (i + 1)).toFixed(2),
+//         img: `https://picsum.photos/200?random=${i + 1}`,
+//         desc: "Description for product " + (i + 1),
+//         category: categories[i % categories.length] // assign categories
+//     }));
+//
+//     // POS React States
+//     const [orderList, setOrderList] = useState([]);
+//     const [selectedProduct, setSelectedProduct] = useState(null);
+//
+//     const [activeCategory, setActiveCategory] = useState("All");
+//     const [searchQuery, setSearchQuery] = useState("");
+//
+//     const [discount, setDiscount] = useState(0);
+//     const [taxRate, setTaxRate] = useState(10); // default 10%
+//
+//     // Filter products by category + search
+//     const filteredProducts = useMemo(() => {
+//         return products.filter(p => {
+//             const matchesCategory = activeCategory === "All" || p.category === activeCategory;
+//             const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+//             return matchesCategory && matchesSearch;
+//         });
+//     }, [activeCategory, products, searchQuery]);
+//
+//     // Add product to cart (qty handled)
+//     const addToOrder = () => {
+//         setOrderList(prev => {
+//             const exists = prev.find(item => item.id === selectedProduct.id);
+//             if (exists) {
+//                 return prev.map(item =>
+//                     item.id === selectedProduct.id
+//                         ? { ...item, qty: item.qty + 1 }
+//                         : item
+//                 );
+//             }
+//             return [...prev, { ...selectedProduct, qty: 1 }];
+//         });
+//
+//         setSelectedProduct(null);
+//     };
+//
+//     // Increase or decrease qty
+//     const updateQty = (id, amount) => {
+//         setOrderList(prev =>
+//             prev
+//                 .map(item =>
+//                     item.id === id
+//                         ? { ...item, qty: Math.max(1, item.qty + amount) }
+//                         : item
+//                 )
+//         );
+//     };
+//
+//     // Remove item completely
+//     const removeItem = (id) => {
+//         setOrderList(prev => prev.filter(item => item.id !== id));
+//     };
+//
+//     // Totals
+//     const subtotal = orderList.reduce(
+//         (sum, p) => sum + parseFloat(p.price) * p.qty,
+//         0
+//     );
+//
+//     const tax = (subtotal - discount) * (taxRate / 100);
+//     const grandTotal = subtotal - discount + tax;
+//
+//     // Print receipt
+//     const printReceipt = () => {
+//         const receipt = `
+// ----- RECEIPT -----
+// Items:
+// ${orderList.map(i => `${i.name} x${i.qty} = $${(i.qty * i.price).toFixed(2)}`).join("\n")}
+// -------------------
+// Subtotal: $${subtotal.toFixed(2)}
+// Discount: $${discount.toFixed(2)}
+// Tax (${taxRate}%): $${tax.toFixed(2)}
+// TOTAL: $${grandTotal.toFixed(2)}
+// -------------------
+// Thank you!
+// `;
+//
+//         const printWindow = window.open("", "PRINT", "height=600,width=400");
+//         printWindow.document.write(`<pre>${receipt}</pre>`);
+//         printWindow.document.close();
+//         printWindow.focus();
+//         printWindow.print();
+//         printWindow.close();
+//
+//         setOrderList([]); // clear cart after payment
+//     };
+//
+//     return (
+//         <>
+//             <style>{`
+//                 .pos-wrapper { height: calc(100vh - 70px); margin-top: 70px; display: flex; }
+//                 .right-panel { width: 30%; padding: 15px; overflow-y: auto; height: 100%;}
+//                 .left-panel { width: 70%; padding: 15px;height:flex; overflow-y: auto; }
+//                 .product-card { cursor: pointer; transition: 0.25s; border-radius: 12px; }
+//                 .product-card:hover { transform: scale(1.03); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+//                 .product-img { height: 140px; width: 100%; object-fit: cover;border-radius: 12px; }
+//                 @media(max-width:1200px){ .col-2{ width:25% !important; } }
+//                 @media(max-width:992px){ .col-2{ width:33.3% !important; } }
+//                 @media(max-width:768px){ .col-2{ width:50% !important; } }
+//             `}</style>
+//
+//             {/* NAVBAR */}
+//             <nav className="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
+//                 <div className="container">
+//                     <a className="navbar-brand fw-bold" href="#">StockMaster POS</a>
+//                 </div>
+//             </nav>
+//
+//             {/* POS LAYOUT */}
+//             <div className="pos-wrapper">
+//
+//                 {/* RIGHT: PRODUCTS */}
+//                 <div className="left-panel">
+//
+//                     {/* Search */}
+//                     <div className="input-group mb-2">
+//                         <input type="text"
+//                                placeholder="Search products..."
+//                                className="form-control"
+//                                onChange={(e) => setSearchQuery(e.target.value)}
+//                         />
+//                     </div>
+//
+//                     {/* Categories */}
+//                     <div className="d-flex gap-2 mb-2 overflow-auto">
+//                         <button
+//                             className={`btn btn-sm ${activeCategory === "All" ? "btn-primary" : "btn-light"}`}
+//                             onClick={() => setActiveCategory("All")}
+//                         >All</button>
+//
+//                         {categories.map(cat => (
+//                             <button
+//                                 key={cat}
+//                                 className={`btn btn-sm ${activeCategory === cat ? "btn-primary" : "btn-light"}`}
+//                                 onClick={() => setActiveCategory(cat)}
+//                             >{cat}</button>
+//                         ))}
+//                     </div>
+//
+//                     {/* Product Grid */}
+//                     <div className="row g-2">
+//                         {filteredProducts.map((p) => (
+//                             <div className="col-2" style={{ width: "20%" }} key={p.id}>
+//                                 <div className="product-card p-0" onClick={() => setSelectedProduct(p)}>
+//                                     <img src={p.img} className="product-img" />
+//                                     <div className="p-2">
+//                                         <strong className="small">{p.name}</strong>
+//                                         <div className="text-primary fw-bold">${p.price}</div>
+//                                     </div>
+//                                 </div>
+//                             </div>
+//                         ))}
+//                     </div>
+//
+//                 </div>
+//
+//                 <div className="right-panel">
+//                     <div className="card p-2 mb-2">
+//                         <h6 className="fw-bold">Order Details</h6>
+//                         <div className="order-list">
+//                             {orderList.map((item) => (
+//                                 <div key={item.id} className="border-bottom py-2 d-flex justify-content-between">
+//                                     <div>
+//                                         <strong>{item.name}</strong>
+//                                         <div className="d-flex mt-1 gap-2">
+//                                             <button className="btn btn-sm btn-outline-secondary"
+//                                                     onClick={() => updateQty(item.id, -1)}>-</button>
+//                                             <span className="px-2">{item.qty}</span>
+//                                             <button className="btn btn-sm btn-outline-secondary"
+//                                                     onClick={() => updateQty(item.id, +1)}>+</button>
+//                                             <button className="btn btn-sm btn-danger ms-2"
+//                                                     onClick={() => removeItem(item.id)}>
+//                                                 <i className="bi bi-trash"></i>
+//                                             </button>
+//                                         </div>
+//                                     </div>
+//                                     <span>${(item.qty * item.price).toFixed(2)}</span>
+//                                 </div>
+//                             ))}
+//                         </div>
+//
+//                         <div className="mt-3">
+//
+//                             <div>Subtotal: ${subtotal.toFixed(2)}</div>
+//                             <div>Tax: ${tax.toFixed(2)}</div>
+//                             <h5 className="fw-bold mt-2">Total: ${grandTotal.toFixed(2)}</h5>
+//
+//                             <div className="row g-2 mt-3">
+//
+//                                 <div className="col-4">
+//                                     <button className="btn btn-success w-100 d-flex align-items-center justify-content-center"
+//                                             onClick={printReceipt}>
+//                                         <i className="bi bi-cash-coin me-1"></i> Checkout
+//                                     </button>
+//                                 </div>
+//
+//                                 <div className="col-4">
+//                                     <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+//                                             onClick={printReceipt}>
+//                                         <i className="bi bi-printer me-1"></i> Print
+//                                     </button>
+//                                 </div>
+//
+//                                 <div className="col-4">
+//                                     <button className="btn btn-warning w-100 d-flex align-items-center justify-content-center text-dark"
+//                                             onClick={printReceipt}>
+//                                         <i className="bi bi-eye me-1"></i> Preview
+//                                     </button>
+//                                 </div>
+//
+//                             </div>
+//
+//                         </div>
+//                     </div>
+//                 </div>
+//             </div>
+//
+//             {/* PRODUCT MODAL */}
+//             {selectedProduct && (
+//                 <div className="modal fade show" style={{ display: "block", background: "rgba(0,0,0,0.5)" }}>
+//                     <div className="modal-dialog modal-dialog-centered">
+//                         <div className="modal-content">
+//
+//                             <div className="modal-header">
+//                                 <h5 className="modal-title">{selectedProduct.name}</h5>
+//                                 <button className="btn-close" onClick={() => setSelectedProduct(null)}></button>
+//                             </div>
+//
+//                             <div className="modal-body">
+//                                 <div className="row">
+//                                     <div className="col-12">
+//                                         <img src={selectedProduct.img} className="img-fluid display-6 rounded mb-2" />
+//                                     </div>
+//                                 </div>
+//                                 <p>{selectedProduct.desc}</p>
+//                                 <h5 className="text-primary text-end">${selectedProduct.price}</h5>
+//                             </div>
+//
+//                             <div className="modal-footer">
+//                                 <button className="btn btn-primary" onClick={addToOrder}>Add to Order</button>
+//                             </div>
+//
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
+//         </>
+//     );
+// };
+//
+// export default POSPage;
 import React, { useState, useMemo } from "react";
+import Swal from "sweetalert2";
 
 const POSPage = () => {
     // Categories
@@ -379,6 +647,53 @@ const POSPage = () => {
         );
     };
 
+    const confirmAndAdd = async (product) => {
+        const result = await Swal.fire({
+            title: "Add item to order?",
+            html: `
+      <strong>${product.name}</strong><br/>
+      <span style="color:#2563eb;font-size:16px;">
+        $${product.price}
+      </span>
+    `,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Add Item",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#2563eb", // professional blue
+            cancelButtonColor: "#9ca3af",
+            reverseButtons: true,
+        });
+
+        if (!result.isConfirmed) return;
+
+        setOrderList((prev) => {
+            const exists = prev.find((item) => item.id === product.id);
+
+            if (exists) {
+                return prev.map((item) =>
+                    item.id === product.id
+                        ? { ...item, qty: item.qty + 1 }
+                        : item
+                );
+            }
+
+            return [...prev, { ...product, qty: 1 }];
+        });
+
+        // Optional success feedback (POS-style quick toast)
+        Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: "Added to order",
+            showConfirmButton: false,
+            timer: 1200,
+            timerProgressBar: true,
+        });
+    };
+
+
     // Remove item completely
     const removeItem = (id) => {
         setOrderList(prev => prev.filter(item => item.id !== id));
@@ -389,6 +704,64 @@ const POSPage = () => {
         (sum, p) => sum + parseFloat(p.price) * p.qty,
         0
     );
+
+    const sendOrderToKitchen = async () => {
+        if (orderList.length === 0) return;
+
+        const result = await Swal.fire({
+            title: "Send order to kitchen?",
+            html: `
+      <strong>${orderList.length}</strong> item(s)<br/>
+      Total: <strong>$${grandTotal.toFixed(2)}</strong>
+    `,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Send Order",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#111827",
+            cancelButtonColor: "#9ca3af",
+            reverseButtons: true,
+        });
+
+        if (!result.isConfirmed) return;
+
+        // 🔁 Simulate API call
+        console.log("📤 Sent to kitchen:", {
+            items: orderList,
+            total: grandTotal,
+            sentAt: new Date().toISOString(),
+        });
+
+        // STEP 3: Ask to print receipt
+        const askPrint = await Swal.fire({
+            title: "Order Sent",
+            text: "Would you like to print the receipt?",
+            icon: "success",
+            showCancelButton: true,
+            confirmButtonText: "Print Receipt",
+            cancelButtonText: "No, Thanks",
+            confirmButtonColor: "#2563eb",
+            cancelButtonColor: "#9ca3af",
+            reverseButtons: true,
+        });
+
+        if (askPrint.isConfirmed) {
+            printReceipt();
+        }
+
+        Swal.fire({
+            toast: true,
+            icon: "success",
+            title: "Order sent to kitchen",
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 1500,
+        });
+
+        // Clear cart after send
+        setOrderList([]);
+    };
+
 
     const tax = (subtotal - discount) * (taxRate / 100);
     const grandTotal = subtotal - discount + tax;
@@ -421,23 +794,129 @@ Thank you!
     return (
         <>
             <style>{`
-                .pos-wrapper { height: calc(100vh - 70px); margin-top: 70px; display: flex; }
-                .right-panel { width: 30%; padding: 15px; overflow-y: auto; height: 100%;}
-                .left-panel { width: 70%; padding: 15px;height:flex; overflow-y: auto; }
-                .product-card { cursor: pointer; transition: 0.25s; border-radius: 12px; }
-                .product-card:hover { transform: scale(1.03); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-                .product-img { height: 140px; width: 100%; object-fit: cover;border-radius: 12px; }
-                @media(max-width:1200px){ .col-2{ width:25% !important; } }
-                @media(max-width:992px){ .col-2{ width:33.3% !important; } }
-                @media(max-width:768px){ .col-2{ width:50% !important; } }
-            `}</style>
+  body {
+    background: #f4f6f8;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont;
+  }
+
+  .pos-wrapper {
+    height: calc(100vh - 64px);
+    margin-top: 64px;
+    display: flex;
+    background: #f4f6f8;
+  }
+
+  /* PANELS */
+  .left-panel {
+    width: 70%;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .right-panel {
+    width: 30%;
+    padding: 16px;
+    background: #f9fafb;
+    border-left: 1px solid #e5e7eb;
+  }
+
+  /* PRODUCT CARD */
+  .product-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .product-card:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+  }
+
+  .product-img {
+    height: 140px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+  }
+
+  /* CATEGORY BUTTONS */
+  .category-btn {
+    border-radius: 20px;
+    font-size: 13px;
+    padding: 6px 14px;
+  }
+
+  /* ORDER PANEL */
+  .order-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+
+  .order-row {
+    padding: 8px 0;
+    border-bottom: 1px dashed #e5e7eb;
+  }
+
+  .order-row:last-child {
+    border-bottom: none;
+  }
+
+  /* TOTALS */
+  .totals {
+    font-size: 14px;
+    color: #374151;
+  }
+
+  .grand-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  /* NAVBAR */
+  .navbar {
+    height: 64px;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    border-radius: 8px;
+  }
+
+  /* RESPONSIVE GRID */
+  @media (max-width: 1200px) {
+    .col-2 { width: 25% !important; }
+  }
+  @media (max-width: 992px) {
+    .col-2 { width: 33.33% !important; }
+  }
+`}</style>
+
 
             {/* NAVBAR */}
-            <nav className="navbar navbar-expand-lg fixed-top bg-white shadow-sm">
-                <div className="container">
-                    <a className="navbar-brand fw-bold" href="#">StockMaster POS</a>
+            <nav className="navbar fixed-top">
+                <div className="container-fluid px-4">
+                    <span className="navbar-brand">StockMaster POS</span>
+
+                    <div className="d-flex align-items-center gap-3">
+                        <span className="text-muted small">Terminal #02</span>
+                        <span className="badge bg-success-subtle text-success">
+        Online
+      </span>
+                    </div>
                 </div>
             </nav>
+
 
             {/* POS LAYOUT */}
             <div className="pos-wrapper">
@@ -474,13 +953,18 @@ Thank you!
                     <div className="row g-2">
                         {filteredProducts.map((p) => (
                             <div className="col-2" style={{ width: "20%" }} key={p.id}>
-                                <div className="product-card p-0" onClick={() => setSelectedProduct(p)}>
+                                <div className="product-card" onClick={() => confirmAndAdd(p)}>
                                     <img src={p.img} className="product-img" />
                                     <div className="p-2">
-                                        <strong className="small">{p.name}</strong>
-                                        <div className="text-primary fw-bold">${p.price}</div>
+                                        <div className="fw-medium small text-truncate">
+                                            {p.name}
+                                        </div>
+                                        <div className="fw-semibold text-end">
+                                            ${p.price}
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
                         ))}
                     </div>
@@ -512,38 +996,32 @@ Thank you!
                             ))}
                         </div>
 
-                        <div className="mt-3">
+                        <div className="totals mt-3">
+                            <div className="d-flex justify-content-between">
+                                <span>Subtotal</span>
+                                <span>${subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span>Tax</span>
+                                <span>${tax.toFixed(2)}</span>
+                            </div>
 
-                            <div>Subtotal: ${subtotal.toFixed(2)}</div>
-                            <div>Tax: ${tax.toFixed(2)}</div>
-                            <h5 className="fw-bold mt-2">Total: ${grandTotal.toFixed(2)}</h5>
-
-                            <div className="row g-2 mt-3">
-
-                                <div className="col-4">
-                                    <button className="btn btn-success w-100 d-flex align-items-center justify-content-center"
-                                            onClick={printReceipt}>
-                                        <i className="bi bi-cash-coin me-1"></i> Checkout
-                                    </button>
-                                </div>
-
-                                <div className="col-4">
-                                    <button className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
-                                            onClick={printReceipt}>
-                                        <i className="bi bi-printer me-1"></i> Print
-                                    </button>
-                                </div>
-
-                                <div className="col-4">
-                                    <button className="btn btn-warning w-100 d-flex align-items-center justify-content-center text-dark"
-                                            onClick={printReceipt}>
-                                        <i className="bi bi-eye me-1"></i> Preview
-                                    </button>
-                                </div>
-
+                            <div className="d-flex justify-content-between mt-2 grand-total">
+                                <span>Total</span>
+                                <span>${grandTotal.toFixed(2)}</span>
                             </div>
 
                         </div>
+
+                        <button
+                            className="btn btn-dark w-100 mb-2"
+                            disabled={orderList.length === 0}
+                            onClick={sendOrderToKitchen}
+                        >
+                            <i className="bi bi-send me-1"></i>
+                            Send Order to Kitchen
+                        </button>
+
                     </div>
                 </div>
             </div>

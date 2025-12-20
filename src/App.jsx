@@ -15,6 +15,8 @@ import Dashboard from "./pages/Dashbord.jsx";
 import BandManagement from "./pages/Admin.jsx";
 import ProfileSettings from "./pages/profile.jsx";
 import Stock from "./pages/Stock.jsx";
+import Setting from "./pages/Setting.jsx";
+import KitchenDashboard from "./pages/KitchenDashboard.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -25,8 +27,10 @@ function App() {
             <Route path="/" element={<Login/>}></Route>
             <Route path="/dashboard" element={<Dashboard/>}></Route>
             <Route path="/dw" element={<ProfileSettings/>}></Route>
+            <Route path="/kitchen" element={<KitchenDashboard />}></Route>
             <Route path="/dd" element={<BandManagement/>}></Route>
             <Route path="/stock" element={<Stock />}></Route>
+            <Route path="/setting" element={<Setting />}></Route>
             <Route path="/see" element={<StorePage/>}></Route>
             <Route path="/pos" element={<POSPage/>}></Route>
             {/* Customer routes */}

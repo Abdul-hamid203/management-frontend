@@ -365,3 +365,89 @@ h4 {
     color: #198754;
     margin-bottom: 4px;
 }
+
+.order-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.order-id {
+    font-weight: 600;
+    color: #111827;
+}
+
+.summary-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.status-badge.pending {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.status-badge.late {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-badge.served {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.item-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+}
+
+.item-list li {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+}
+
+.item-list strong {
+    font-size: 0.9rem;
+}
+
+.item-list small {
+    color: #6b7280;
+}
+
+.timer {
+    font-weight: 600;
+    color: #0369a1;
+}
+
+.timer.late {
+    color: #dc2626;
+}
+
+.order-list {
+    max-height: 320px;        /* fits ~4 items nicely */
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+.order-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.order-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
