@@ -708,12 +708,64 @@ const POSPage = () => {
     const sendOrderToKitchen = async () => {
         if (orderList.length === 0) return;
 
-        const result = await Swal.fire({
+        // Step 1: Ask if user has coupon
+        const hasCoupon = await Swal.fire({
+            title: "Do you have a coupon code?",
+            showCancelButton: true,
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+        });
+
+        let discountApplied = 0;
+
+        if (hasCoupon.isConfirmed) {
+            const couponInput = await Swal.fire({
+                title: "Enter coupon details",
+                html: `
+                <input id="lastName" class="swal2-input" placeholder="Customer Last Name">
+                <input id="couponCode" class="swal2-input" placeholder="Coupon Code">
+            `,
+                preConfirm: () => {
+                    const lastName = Swal.getPopup().querySelector("#lastName").value;
+                    const couponCode = Swal.getPopup().querySelector("#couponCode").value;
+                    return { lastName, couponCode };
+                },
+            });
+
+            if (!couponInput.value) return; // user cancelled
+
+            const { lastName, couponCode } = couponInput.value;
+
+            // Simple demo validation
+            const validCoupons = [
+                { code: "SAVE10", lastName: "Smith", discount: 10 },
+                { code: "WELCOME5", lastName: "Johnson", discount: 5 },
+            ];
+
+            const match = validCoupons.find(
+                (c) =>
+                    c.code === couponCode.toUpperCase() &&
+                    c.lastName.toLowerCase() === lastName.toLowerCase()
+            );
+
+            if (match) {
+                discountApplied = match.discount;
+                setDiscount(match.discount);
+
+                await Swal.fire("Coupon Applied!", `Discount: $${match.discount}`, "success");
+            } else {
+                await Swal.fire("Invalid Coupon", "Please check the name and code.", "error");
+                return; // stop if coupon invalid
+            }
+        }
+
+        // Step 2: Confirm send order
+        const confirmSend = await Swal.fire({
             title: "Send order to kitchen?",
             html: `
-      <strong>${orderList.length}</strong> item(s)<br/>
-      Total: <strong>$${grandTotal.toFixed(2)}</strong>
-    `,
+            <strong>${orderList.length}</strong> item(s)<br/>
+            Total: <strong>$${(grandTotal - discountApplied).toFixed(2)}</strong>
+        `,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Send Order",
@@ -723,16 +775,16 @@ const POSPage = () => {
             reverseButtons: true,
         });
 
-        if (!result.isConfirmed) return;
+        if (!confirmSend.isConfirmed) return;
 
-        // 🔁 Simulate API call
+        // Step 3: Simulate API call
         console.log("📤 Sent to kitchen:", {
             items: orderList,
-            total: grandTotal,
+            total: grandTotal - discountApplied,
             sentAt: new Date().toISOString(),
         });
 
-        // STEP 3: Ask to print receipt
+        // Step 4: Ask to print receipt
         const askPrint = await Swal.fire({
             title: "Order Sent",
             text: "Would you like to print the receipt?",
@@ -749,6 +801,7 @@ const POSPage = () => {
             printReceipt();
         }
 
+        // Step 5: Toast notification
         Swal.fire({
             toast: true,
             icon: "success",
@@ -758,9 +811,10 @@ const POSPage = () => {
             timer: 1500,
         });
 
-        // Clear cart after send
+        // Clear cart
         setOrderList([]);
     };
+
 
 
     const tax = (subtotal - discount) * (taxRate / 100);
