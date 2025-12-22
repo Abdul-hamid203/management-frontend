@@ -13,17 +13,8 @@ const BandManagement = () => {
     const [filter, setFilter] = useState("all");
     const [showImportModal, setShowImportModal] = useState(false);
     const [items, setItems] = useState([]); // stock items
+    const [showInfoModal, setShowInfoModal] = useState(false);
     const isEmpty = items.length === 0;
-
-    useEffect(() => {
-        if (showImportModal) {
-            document.body.classList.add("modal-open");
-        } else {
-            document.body.classList.remove("modal-open");
-        }
-
-        return () => document.body.classList.remove("modal-open");
-    }, [showImportModal]);
 
 
     return (
@@ -174,82 +165,79 @@ const BandManagement = () => {
                                     </div>
                                 </div>
                             ))}
+
                         </div>
                     )}
 
+
                 </div>
             </div>
-            {showImportModal && (
-                <div className="modal fade show d-block" tabIndex="-1" style={{ zIndex: 1055 }}>
-                <div className="modal-dialog modal-dialog-centered">
-                        <div className="modal-content">
 
-                            {/* Modal Header */}
-                            <div className="modal-header">
-                                <h5 className="modal-title">Import Stock Items</h5>
+            {showImportModal && (
+                <div
+                    className="modal fade"
+                    id="importModal"
+                    tabIndex="-1"
+                    aria-hidden="true"
+                >
+                    <div className="modal-dialog modal-lg modal-dialog-centered">
+                        <div className="modal-content rounded-4 border-0 shadow">
+
+                            <div className="modal-header border-0">
+                                <h5 className="modal-title fw-bold">Import Items</h5>
                                 <button
                                     type="button"
                                     className="btn-close"
-                                    onClick={() => setShowImportModal(false)}
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"
                                 />
                             </div>
 
-                            {/* Modal Body */}
                             <div className="modal-body">
-                                <div className="mb-3">
-                                    <label className="form-label fw-semibold">
-                                        Upload File
-                                    </label>
+                                <label className="fw-semibold mb-2">Upload CSV File</label>
+
+                                <div className="border rounded-4 p-4 text-center bg-light">
+                                    <i className="bi bi-filetype-csv fs-1 text-primary"></i>
+                                    <p className="mt-2 text-muted mb-0">
+                                        Only .csv files are supported
+                                    </p>
+
                                     <input
                                         type="file"
-                                        className="form-control"
-                                        accept=".csv,.xlsx"
+                                        accept=".csv"
+                                        className="form-control mt-3"
                                     />
-                                    <small className="text-muted">
-                                        Supported formats: CSV, XLSX
-                                    </small>
-                                </div>
-
-                                <div className="mb-3">
-                                    <label className="form-label fw-semibold">
-                                        Import Type
-                                    </label>
-                                    <select className="form-select">
-                                        <option>Add new items</option>
-                                        <option>Update existing items</option>
-                                    </select>
                                 </div>
                             </div>
 
-                            {/* Modal Footer */}
-                            <div className="modal-footer">
+                            <div className="modal-footer border-0">
                                 <button
-                                    className="btn btn-outline-secondary"
-                                    onClick={() => setShowImportModal(false)}
+                                    type="button"
+                                    className="btn btn-secondary rounded-pill px-4"
+                                    data-bs-dismiss="modal"
                                 >
                                     Cancel
                                 </button>
-                                <button className="btn btn-primary">
+                                <button
+                                    type="button"
+                                    className="btn btn-primary rounded-pill px-4"
+                                >
                                     Import
                                 </button>
                             </div>
 
                         </div>
                     </div>
-
-                    {/* Backdrop */}
-                    <div
-                        className="modal-backdrop fade show"
-                        onClick={() => setShowImportModal(false)}
-                    />
                 </div>
             )}
+
+
 
         </div>
     );
 };
 
-const StatCard = ({ title, value, subtitle, icon, green, blue }) => (
+const StatCard = ({title, value, subtitle, icon, green, blue}) => (
     <div className="col-xl-3 col-md-6">
         <div className="card band-card h-100">
             <div className="card-body d-flex justify-content-between">

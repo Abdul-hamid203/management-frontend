@@ -1,16 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {
-    Plus,
-    Image,
-    FileText,
-    Wrench,
-    MusicNote,
-    Eye,
+    CurrencyDollar, ExclamationTriangle,
+    Eye, FileText, Image, MusicNote, Wrench,
 } from "react-bootstrap-icons";
 import HeaderComponent from "../components/HeaderComponent.jsx";
 import {useNavigate} from "react-router-dom";
 
-const Setting = () => {
+const Purchase = () => {
     const [showImportModal, setShowImportModal] = useState(false);
     const [showNewItemModal, setShowNewItemModal] = useState(false);
     const [showInfoModal, setShowInfoModal] = useState(false);
@@ -18,6 +14,8 @@ const Setting = () => {
     const [showItemModal, setShowItemModal] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
+    const [filter, setFilter] = useState("all");
+
 
     const itemsData = [
         {
@@ -26,7 +24,10 @@ const Setting = () => {
             category: "Electronics",
             description: "Main hero section displayed on the homepage",
             status: "active",
-            image: "https://via.placeholder.com/50/0d6efd/ffffff?text=HB"
+            image: "https://via.placeholder.com/50/0d6efd/ffffff?text=HB",
+            unitPrice: 120,        // price per unit
+            neededQty: 2,          // quantity needed to purchase
+            unit: "kg",
         },
         {
             id: 2,
@@ -34,7 +35,10 @@ const Setting = () => {
             category: "Accessories",
             description: "Quick navigation links shown at the bottom",
             status: "inactive",
-            image: "https://via.placeholder.com/50/f0ad4e/ffffff?text=FL"
+            image: "https://via.placeholder.com/50/f0ad4e/ffffff?text=FL",
+            unitPrice: 50,
+            neededQty: 5,
+            unit: "bucket",
         },
         {
             id: 3,
@@ -42,7 +46,10 @@ const Setting = () => {
             category: "Furniture",
             description: "Carousel for highlighting featured products",
             status: "active",
-            image: "https://via.placeholder.com/50/198754/ffffff?text=PS"
+            image: "https://via.placeholder.com/50/198754/ffffff?text=PS",
+            unitPrice: 300,
+            neededQty: 1,
+            unit: "ounce",
         },
         {
             id: 4,
@@ -50,19 +57,78 @@ const Setting = () => {
             category: "Consumables",
             description: "Form to allow users to send messages",
             status: "active",
-            image: "https://via.placeholder.com/50/6c757d/ffffff?text=CF"
+            image: "https://via.placeholder.com/50/6c757d/ffffff?text=CF",
+            unitPrice: 30,
+            neededQty: 3,
+            unit: "kg",
         },
     ];
 
+    const filteredItems = itemsData.filter(item => {
+        if (filter.startsWith("category:")) {
+            return item.category === filter.split(":")[1];
+        } else if (filter === "price:high") {
+            return true; // We'll sort by price later
+        } else if (filter === "price:low") {
+            return true; // We'll sort by price later
+        } else if (filter === "status:active") {
+            return item.status === "active";
+        } else if (filter === "status:inactive") {
+            return item.status === "inactive";
+        }
+        return true;
+    });
 
+// Sort if needed
+    if (filter === "price:high") filteredItems.sort((a,b) => b.unitPrice - a.unitPrice);
+    if (filter === "price:low") filteredItems.sort((a,b) => a.unitPrice - b.unitPrice);
+
+    const totalPurchaseCost = itemsData.reduce(
+        (sum, item) => sum + item.unitPrice * item.neededQty,
+        0
+    );
+
+
+    // Calculate stats
+    const categoriesCount = [...new Set(itemsData.map(i => i.category))].length; // how many categories
     const totalItems = itemsData.length;
-    const activeItems = itemsData.filter(i => i.status === "active").length;
-    const inactiveItems = itemsData.filter(i => i.status === "inactive").length;
+    const emergencyItems = itemsData.filter(i => i.emergency).length;
+    const totalCost = itemsData.reduce((acc, i) => acc + i.cost, 0);
 
+    const stats = [
+        {
+            title: "From categories",
+            value: categoriesCount,
+            change: "+2 from last month",
+            icon: <Image />,
+            color: "primary"
+        },
+        {
+            title: "Total items",
+            value: totalItems,
+            change: "+8 from last month",
+            icon: <FileText />,
+            color: "success"
+        },
+        {
+            title: "Emergency need",
+            value: emergencyItems,
+            change: "+1 from last month",
+            icon: <ExclamationTriangle />,
+            color: "warning"
+        },
+        {
+            title: "Total cost",
+            value: `$${totalPurchaseCost}`,
+            change: "0 from last month",
+            icon: <CurrencyDollar />,
+            color: "info"
+        }
+    ];
     const [formData, setFormData] = useState({
-        name: "",
-        category: "",
-        description: "",
+        unitPrice: "",
+        neededQty:"",
+        unit:"",
         image: null,
     });
 
@@ -93,9 +159,9 @@ const Setting = () => {
         setIsEditMode(true);
         setCurrentItem(item);
         setFormData({
-            name: item.name || "",
-            category: item.category || "",
-            description: item.description || "",
+            unitPrice: item.unitPrice,
+            neededQty: item.neededQty,
+            unit: item.unit,
             image: null, // reset file input, can show preview separately if needed
         });
         setShowItemModal(true);
@@ -120,12 +186,26 @@ const Setting = () => {
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h2 className="fw-bold mb-1">Stock settings</h2>
+                        <h2 className="fw-bold mb-1">Purchase Section</h2>
                         <p className="text-muted">
                             Welcome ! Here's where's you define happening with the main stock.
                         </p>
                     </div>
                 </div>
+
+                <div className="row g-4 mb-4">
+                    {stats.map((s, index) => (
+                        <StatCard
+                            key={index}
+                            title={s.title}
+                            value={s.value}
+                            change={s.change}
+                            icon={s.icon}
+                            color={s.color}
+                        />
+                    ))}
+                </div>
+
 
                 {/* Bottom Section */}
                 <div className="row g-4 pb-3">
@@ -135,15 +215,16 @@ const Setting = () => {
                             <div className="card dashboard-card h-100 shadow-sm rounded-4">
                                 <div className="card-body">
 
-                                    {/* Header */}
-                                    <div className="d-flex justify-content-between align-items-center mb-4">
+                                    {/* Header with buttons + dynamic filters */}
+                                    <div className="d-flex justify-content-between align-items-start card-header mb-3" style={{ background: "white" }}>
                                         <div>
                                             <h5 className="fw-bold mb-1">Item Settings</h5>
-                                            <p className="text-muted mb-0">Latest changes to your website content</p>
+                                            <p className="text-muted mb-0">Filter and manage items</p>
                                         </div>
 
-                                        {/* Actions */}
-                                        <div className="d-flex gap-2">
+                                        <div className="d-flex align-items-center gap-2">
+
+                                            {/* Import / Add / Info Buttons */}
                                             <button className="btn btn-sm btn-outline-secondary" title="Import" onClick={setShowImportModal}>
                                                 <i className="bi bi-upload"></i>
                                             </button>
@@ -153,36 +234,27 @@ const Setting = () => {
                                             <button className="btn btn-sm btn-outline-secondary" title="Info" onClick={setShowInfoModal}>
                                                 <i className="bi bi-info-lg"></i>
                                             </button>
+
+                                            {/* Dynamic Filters */}
+                                            <select
+                                                className="form-select form-select-sm ms-2"
+                                                style={{ minWidth: "160px" }}
+                                                value={filter}
+                                                onChange={(e) => setFilter(e.target.value)}
+                                            >
+                                                <option value="all">All Items</option>
+                                                <option value="category:Electronics">Category: Electronics</option>
+                                                <option value="category:Furniture">Category: Furniture</option>
+                                                <option value="category:Accessories">Category: Accessories</option>
+                                                <option value="price:high">Price: Highest</option>
+                                                <option value="price:low">Price: Lowest</option>
+                                                <option value="status:active">Status: Active</option>
+                                                <option value="status:inactive">Status: Inactive</option>
+                                            </select>
+
                                         </div>
                                     </div>
 
-                                    {/* Stats Row */}
-                                    <div className="row text-center mb-4">
-                                        <div className="col-md-3 mb-3 mb-md-0">
-                                            <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold">Last Import</div>
-                                                <small className="text-muted d-block">12 Sep 2025</small>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-3 mb-3 mb-md-0">
-                                            <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold">Total Items</div>
-                                                <small className="text-muted d-block">{totalItems}</small>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-3 mb-3 mb-md-0">
-                                            <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold text-success">Active Items</div>
-                                                <small className="text-muted d-block">{activeItems}</small>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-3">
-                                            <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold text-warning">Inactive Items</div>
-                                                <small className="text-muted d-block">{inactiveItems}</small>
-                                            </div>
-                                        </div>
-                                    </div>
 
                                     {/* Item List */}
                                     <div
@@ -190,26 +262,22 @@ const Setting = () => {
                                         className="p-2 bg-white border rounded shadow-sm"
                                     >
                                         <ul className="list-unstyled mb-0">
-                                            {itemsData.map((item) => (
+                                            {filteredItems.map((item) => (
                                                 <li
                                                     key={item.id}
                                                     className="item-row d-flex justify-content-between align-items-start p-3 rounded mb-2 border border-light shadow-sm hover-shadow"
                                                     style={{ transition: "all 0.2s", cursor: "pointer" }}
                                                 >
                                                     <div className="d-flex align-items-start gap-3">
-                                                        {/* Thumbnail Image */}
                                                         <img
-                                                            src={item.image || "https://via.placeholder.com/50"} // fallback if no image
+                                                            src={item.image || "https://via.placeholder.com/50"}
                                                             alt={item.name}
                                                             className="rounded-3"
                                                             style={{ width: "50px", height: "50px", objectFit: "cover" }}
                                                         />
-
                                                         <div>
                                                             <div className="d-flex align-items-center gap-2 mb-1">
                                                                 <div className="fw-semibold">{item.name}</div>
-
-                                                                {/* Rounded category badge */}
                                                                 <span
                                                                     className={`badge rounded-pill ${
                                                                         item.category === "Electronics"
@@ -224,10 +292,12 @@ const Setting = () => {
               {item.category}
             </span>
                                                             </div>
-                                                            <small className="text-muted">{item.description}</small>
+                                                            <div className="mt-1">
+                                                                <small className="text-muted me-3">Unit: ${item.unitPrice}</small>
+                                                                <small className="text-muted">Qty: {item.neededQty} ({item.unit})</small>
+                                                            </div>
                                                         </div>
                                                     </div>
-
                                                     <button
                                                         className={`btn btn-sm ${
                                                             item.status === "active" ? "btn-outline-success" : "btn-outline-warning"
@@ -241,6 +311,31 @@ const Setting = () => {
                                         </ul>
 
                                     </div>
+
+                                    <div className="d-flex justify-content-end mt-3">
+                                        <button
+                                            className="btn btn-gradient d-flex align-items-center gap-2 px-4 py-2"
+                                            style={{
+                                                background: "linear-gradient(90deg, #0d6efd, #6610f2)",
+                                                color: "white",
+                                                fontWeight: 600,
+                                                borderRadius: "50px",
+                                                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                                transition: "all 0.2s",
+                                            }}
+                                            onClick={() => alert("Proceeding to purchase!")}
+                                            onMouseOver={(e) =>
+                                                (e.currentTarget.style.transform = "scale(1.05)")
+                                            }
+                                            onMouseOut={(e) =>
+                                                (e.currentTarget.style.transform = "scale(1)")
+                                            }
+                                        >
+                                            <i className="bi bi-cart-fill"></i>
+                                            Purchase Now
+                                        </button>
+                                    </div>
+
 
                                 </div>
                             </div>
@@ -515,50 +610,42 @@ const Setting = () => {
                                         <div className="row g-3">
 
                                             {/* Item Name */}
-                                            <div className="col-md-6">
+                                            <div className="col-md-4">
                                                 <label className="fw-semibold mb-1">Item Name</label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     className="form-control rounded-3"
-                                                    value={formData.name}
+                                                    value={formData.unitPrice}
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, name: e.target.value })
                                                     }
                                                 />
                                             </div>
 
-                                            {/* Category */}
-                                            <div className="col-md-6">
-                                                <label className="fw-semibold mb-1">Category</label>
-                                                <select
-                                                    className="form-select rounded-3"
-                                                    value={formData.category}
+                                            {/* Item Name */}
+                                            <div className="col-md-4">
+                                                <label className="fw-semibold mb-1">Item Name</label>
+                                                <input
+                                                    type="number"
+                                                    className="form-control rounded-3"
+                                                    value={formData.neededQty}
                                                     onChange={(e) =>
-                                                        setFormData({ ...formData, category: e.target.value })
+                                                        setFormData({ ...formData, name: e.target.value })
                                                     }
-                                                >
+                                                />
+                                            </div>
+
+                                            <div className="col-md-4">
+                                                <label className="fw-semibold mb-1">Category</label>
+                                                <select className="form-select rounded-3" defaultValue="">
                                                     <option value="" disabled>
-                                                        Select Category
+                                                        Select Unit
                                                     </option>
-                                                    <option>Electronics</option>
+                                                    <option>Kilogram</option>
                                                     <option>Furniture</option>
                                                     <option>Accessories</option>
                                                     <option>Consumables</option>
                                                 </select>
-                                            </div>
-
-                                            {/* Description */}
-                                            <div className="mt-4">
-                                                <label className="fw-semibold mb-1">Description</label>
-                                                <textarea
-                                                    className="form-control rounded-3"
-                                                    rows="4"
-                                                    placeholder="Enter item description..."
-                                                    value={formData.description}
-                                                    onChange={(e) =>
-                                                        setFormData({ ...formData, description: e.target.value })
-                                                    }
-                                                />
                                             </div>
 
                                         </div>
@@ -606,20 +693,21 @@ const Setting = () => {
     );
 };
 
-const StatCard = ({ title, value, change, icon }) => (
+const StatCard = ({ title, value, change, icon, color }) => (
     <div className="col-xl-3 col-md-6">
-        <div className="card dashboard-card h-100">
-            <div className="card-body d-flex justify-content-between">
+        <div className="card band-card h-100 shadow-sm">
+            <div className="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <p className="text-muted mb-1">{title}</p>
-                    <h3 className="fw-bold">{value}</h3>
+                    <h3 className={`fw-bold text-${color}`}>{value}</h3>
                     <small className="text-muted">{change}</small>
                 </div>
-                <div className="stat-icon">{icon}</div>
+                <div className="stat-icon fs-2 text-${color}">{icon}</div>
             </div>
         </div>
     </div>
 );
+
 
 const Activity = ({ title, time, dot }) => (
     <div className="activity-item d-flex justify-content-between align-items-center mb-4">
@@ -635,4 +723,4 @@ const Activity = ({ title, time, dot }) => (
 );
 
 
-export default Setting;
+export default Purchase;

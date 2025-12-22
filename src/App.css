@@ -451,3 +451,9 @@ h4 {
     background: #cbd5e1;
     border-radius: 10px;
 }
+/* Optional CSS to polish hover and spacing */
+.item-row:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    background-color: #f8f9fa;
+}
