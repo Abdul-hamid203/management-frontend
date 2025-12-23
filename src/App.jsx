@@ -1,13 +1,10 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import {Route, Routes} from "react-router-dom";
 import POS from "./pages/POSPage.jsx";
-import LoginPage from "../../FoodFresh/src/pages/LoginPage.jsx";
 import ProtectedRoute from "./Routes/ProtectedRoutes.jsx";
 import AdminLayout from "./Layouts/AdminLayout.jsx";
-import {AuthProvider} from "./Contexts/AuthContext.jsx";
 import StorePage from "./pages/StorePage.jsx";
 import POSPage from "./pages/POSPage.jsx";
 import Login from "./pages/LoginPg.jsx";
@@ -18,7 +15,6 @@ import Stock from "./pages/Stock.jsx";
 import Setting from "./pages/Setting.jsx";
 import KitchenDashboard from "./pages/KitchenDashboard.jsx";
 import Purchase from "./pages/Purchase.jsx";
-import PurchaseImport from "./pages/PurchaseImport.jsx";
 import Purchasemport from "./pages/PurchaseImport.jsx";
 
 function App() {
