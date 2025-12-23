@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import {Route, Routes} from "react-router-dom";
 import POS from "./pages/POSPage.jsx";
-import LoginPage from "./pages/LoginPage.jsx";
+import LoginPage from "../../FoodFresh/src/pages/LoginPage.jsx";
 import ProtectedRoute from "./Routes/ProtectedRoutes.jsx";
 import AdminLayout from "./Layouts/AdminLayout.jsx";
 import {AuthProvider} from "./Contexts/AuthContext.jsx";
@@ -18,6 +18,8 @@ import Stock from "./pages/Stock.jsx";
 import Setting from "./pages/Setting.jsx";
 import KitchenDashboard from "./pages/KitchenDashboard.jsx";
 import Purchase from "./pages/Purchase.jsx";
+import PurchaseImport from "./pages/PurchaseImport.jsx";
+import Purchasemport from "./pages/PurchaseImport.jsx";
 
 function App() {
   const [count, setCount] = useState(0)
@@ -33,6 +35,7 @@ function App() {
             <Route path="/stock" element={<Stock />}></Route>
             <Route path="/setting" element={<Setting />}></Route>
             <Route path="/purchase" element={<Purchase />}></Route>
+            <Route path="/import" element={<Purchasemport />}></Route>
             <Route path="/see" element={<StorePage/>}></Route>
             <Route path="/pos" element={<POSPage/>}></Route>
             {/* Customer routes */}

@@ -193,18 +193,18 @@ const Purchase = () => {
                     </div>
                 </div>
 
-                <div className="row g-4 mb-4">
-                    {stats.map((s, index) => (
-                        <StatCard
-                            key={index}
-                            title={s.title}
-                            value={s.value}
-                            change={s.change}
-                            icon={s.icon}
-                            color={s.color}
-                        />
-                    ))}
-                </div>
+                {/*<div className="row g-4 mb-4">*/}
+                {/*    {stats.map((s, index) => (*/}
+                {/*        <StatCard*/}
+                {/*            key={index}*/}
+                {/*            title={s.title}*/}
+                {/*            value={s.value}*/}
+                {/*            change={s.change}*/}
+                {/*            icon={s.icon}*/}
+                {/*            color={s.color}*/}
+                {/*        />*/}
+                {/*    ))}*/}
+                {/*</div>*/}
 
 
                 {/* Bottom Section */}
@@ -215,6 +215,34 @@ const Purchase = () => {
                             <div className="card dashboard-card h-100 shadow-sm rounded-4">
                                 <div className="card-body">
 
+                                    {/* Stats Row */}
+                                    <div className="row text-center mb-4">
+                                        <div className="col-md-3 mb-3 mb-md-0">
+                                            <div className="p-3 bg-light rounded-4 shadow-sm">
+                                                <div className="fw-semibold">Last Import</div>
+                                                <small className="text-muted d-block">12 Sep 2025</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 mb-3 mb-md-0">
+                                            <div className="p-3 bg-light rounded-4 shadow-sm">
+                                                <div className="fw-semibold">Total Items</div>
+                                                <small className="text-muted d-block">{totalItems}</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 mb-3 mb-md-0">
+                                            <div className="p-3 bg-light rounded-4 shadow-sm">
+                                                <div className="fw-semibold text-success">Active Items</div>
+                                                <small className="text-muted d-block">{totalPurchaseCost}</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3">
+                                            <div className="p-3 bg-light rounded-4 shadow-sm">
+                                                <div className="fw-semibold text-warning">Inactive Items</div>
+                                                <small className="text-muted d-block">{categoriesCount}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* Header with buttons + dynamic filters */}
                                     <div className="d-flex justify-content-between align-items-start card-header mb-3" style={{ background: "white" }}>
                                         <div>
@@ -223,22 +251,10 @@ const Purchase = () => {
                                         </div>
 
                                         <div className="d-flex align-items-center gap-2">
-
-                                            {/* Import / Add / Info Buttons */}
-                                            <button className="btn btn-sm btn-outline-secondary" title="Import" onClick={setShowImportModal}>
-                                                <i className="bi bi-upload"></i>
-                                            </button>
-                                            <button className="btn btn-sm btn-outline-secondary" title="Add" onClick={openNewItemModal}>
-                                                <i className="bi bi-plus-lg"></i>
-                                            </button>
-                                            <button className="btn btn-sm btn-outline-secondary" title="Info" onClick={setShowInfoModal}>
-                                                <i className="bi bi-info-lg"></i>
-                                            </button>
-
                                             {/* Dynamic Filters */}
                                             <select
                                                 className="form-select form-select-sm ms-2"
-                                                style={{ minWidth: "160px" }}
+                                                style={{ minWidth: "260px" }}
                                                 value={filter}
                                                 onChange={(e) => setFilter(e.target.value)}
                                             >
@@ -251,6 +267,17 @@ const Purchase = () => {
                                                 <option value="status:active">Status: Active</option>
                                                 <option value="status:inactive">Status: Inactive</option>
                                             </select>
+
+                                            {/* Import / Add / Info Buttons */}
+                                            <button className="btn btn-sm btn-outline-secondary" title="Import" onClick={setShowImportModal}>
+                                                <i className="bi bi-upload"></i>
+                                            </button>
+                                            <button className="btn btn-sm btn-outline-secondary" title="Add" onClick={openNewItemModal}>
+                                                <i className="bi bi-plus-lg"></i>
+                                            </button>
+                                            <button className="btn btn-sm btn-outline-secondary" title="Info" onClick={setShowInfoModal}>
+                                                <i className="bi bi-info-lg"></i>
+                                            </button>
 
                                         </div>
                                     </div>
@@ -289,8 +316,8 @@ const Purchase = () => {
                                                                                     : "bg-secondary"
                                                                     }`}
                                                                 >
-              {item.category}
-            </span>
+                                                              {item.category}
+                                                            </span>
                                                             </div>
                                                             <div className="mt-1">
                                                                 <small className="text-muted me-3">Unit: ${item.unitPrice}</small>
