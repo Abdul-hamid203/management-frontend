@@ -1,10 +1,28 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
     CurrencyDollar, ExclamationTriangle,
     Eye, FileText, Image, MusicNote, Wrench,
 } from "react-bootstrap-icons";
 import HeaderComponent from "../components/HeaderComponent.jsx";
 import {useNavigate} from "react-router-dom";
+
+const categoryData = [
+    {
+        category: "Electronics",
+        units: ["piece", "box", "set"],
+        items: ["Laptop", "Monitor", "Keyboard", "Mouse"]
+    },
+    {
+        category: "Furniture",
+        units: ["piece", "set"],
+        items: ["Chair", "Table", "Sofa"]
+    },
+    {
+        category: "Consumables",
+        units: ["kg", "liter", "pack"],
+        items: ["Rice", "Oil", "Sugar"]
+    }
+];
 
 const Purchase = () => {
     const [showImportModal, setShowImportModal] = useState(false);
@@ -15,6 +33,77 @@ const Purchase = () => {
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentItem, setCurrentItem] = useState(null);
     const [filter, setFilter] = useState("all");
+
+    const [searchKeyword, setSearchKeyword] = useState("");
+    const [suggestions, setSuggestions] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [availableUnits, setAvailableUnits] = useState([]);
+    const isSelectingRef = useRef(false);
+
+    useEffect(() => {
+        if (!searchKeyword) {
+            setSuggestions([]);
+            return;
+        }
+
+        const matches = categoryData.flatMap(cat =>
+            cat.items
+                .filter(item =>
+                    item.toLowerCase().includes(searchKeyword.toLowerCase())
+                )
+                .map(item => ({
+                    item,
+                    category: cat.category,
+                    units: cat.units
+                }))
+        );
+
+        setSuggestions(matches);
+    }, [searchKeyword]);
+
+    const handleSelectItem = (suggestion) => {
+        isSelectingRef.current = true;
+
+        setSearchKeyword(suggestion.item);
+        setSelectedCategory(suggestion.category);
+        setAvailableUnits(suggestion.units);
+
+        setFormData({
+            ...formData,
+            name: suggestion.item,
+            unit: ""
+        });
+
+        setSuggestions([]);
+
+        // allow typing again after render
+        setTimeout(() => {
+            isSelectingRef.current = false;
+        }, 0);
+    };
+
+    useEffect(() => {
+        if (!searchKeyword || isSelectingRef.current) {
+            setSuggestions([]);
+            return;
+        }
+
+        const matches = categoryData.flatMap(cat =>
+            cat.items
+                .filter(item =>
+                    item.toLowerCase().includes(searchKeyword.toLowerCase())
+                )
+                .map(item => ({
+                    item,
+                    category: cat.category,
+                    units: cat.units
+                }))
+        );
+
+        setSuggestions(matches);
+    }, [searchKeyword]);
+
+
 
 
     const itemsData = [
@@ -92,39 +181,7 @@ const Purchase = () => {
     // Calculate stats
     const categoriesCount = [...new Set(itemsData.map(i => i.category))].length; // how many categories
     const totalItems = itemsData.length;
-    const emergencyItems = itemsData.filter(i => i.emergency).length;
-    const totalCost = itemsData.reduce((acc, i) => acc + i.cost, 0);
 
-    const stats = [
-        {
-            title: "From categories",
-            value: categoriesCount,
-            change: "+2 from last month",
-            icon: <Image />,
-            color: "primary"
-        },
-        {
-            title: "Total items",
-            value: totalItems,
-            change: "+8 from last month",
-            icon: <FileText />,
-            color: "success"
-        },
-        {
-            title: "Emergency need",
-            value: emergencyItems,
-            change: "+1 from last month",
-            icon: <ExclamationTriangle />,
-            color: "warning"
-        },
-        {
-            title: "Total cost",
-            value: `$${totalPurchaseCost}`,
-            change: "0 from last month",
-            icon: <CurrencyDollar />,
-            color: "info"
-        }
-    ];
     const [formData, setFormData] = useState({
         unitPrice: "",
         neededQty:"",
@@ -139,6 +196,22 @@ const Purchase = () => {
             setImagePreview(null);
         }
     }, [isEditMode, currentItem]);
+
+    useEffect(() => {
+        const handleClickOutside = () => setSuggestions([]);
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
+
+    useEffect(() => {
+        if (!searchKeyword) {
+            setSelectedCategory(null);
+            setAvailableUnits([]);
+            setFormData({ ...formData, name: "", unit: "" });
+        }
+    }, [searchKeyword]);
+
+
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -155,6 +228,16 @@ const Purchase = () => {
         reader.readAsDataURL(file);
     };
 
+    const handleRemoveItem = (id) => {
+        if (window.confirm("Are you sure you want to remove this item?")) {
+            // Remove item from itemsData
+            // If itemsData is state, update it properly:
+            // setItemsData(prev => prev.filter(item => item.id !== id));
+            console.log("Remove item with id:", id);
+        }
+    };
+
+
     const openEditItemModal = (item) => {
         setIsEditMode(true);
         setCurrentItem(item);
@@ -162,7 +245,6 @@ const Purchase = () => {
             unitPrice: item.unitPrice,
             neededQty: item.neededQty,
             unit: item.unit,
-            image: null, // reset file input, can show preview separately if needed
         });
         setShowItemModal(true);
     };
@@ -173,10 +255,9 @@ const Purchase = () => {
             name: "",
             category: "",
             description: "",
-            image: null,
         });
         setCurrentItem(null);
-        setShowItemModal(true);
+        setShowNewItemModal(true);
     };
 
     return (
@@ -193,20 +274,6 @@ const Purchase = () => {
                     </div>
                 </div>
 
-                {/*<div className="row g-4 mb-4">*/}
-                {/*    {stats.map((s, index) => (*/}
-                {/*        <StatCard*/}
-                {/*            key={index}*/}
-                {/*            title={s.title}*/}
-                {/*            value={s.value}*/}
-                {/*            change={s.change}*/}
-                {/*            icon={s.icon}*/}
-                {/*            color={s.color}*/}
-                {/*        />*/}
-                {/*    ))}*/}
-                {/*</div>*/}
-
-
                 {/* Bottom Section */}
                 <div className="row g-4 pb-3">
                     {/* Recent Activity */}
@@ -219,26 +286,26 @@ const Purchase = () => {
                                     <div className="row text-center mb-4">
                                         <div className="col-md-3 mb-3 mb-md-0">
                                             <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold">Last Import</div>
-                                                <small className="text-muted d-block">12 Sep 2025</small>
-                                            </div>
-                                        </div>
-                                        <div className="col-md-3 mb-3 mb-md-0">
-                                            <div className="p-3 bg-light rounded-4 shadow-sm">
                                                 <div className="fw-semibold">Total Items</div>
                                                 <small className="text-muted d-block">{totalItems}</small>
                                             </div>
                                         </div>
                                         <div className="col-md-3 mb-3 mb-md-0">
                                             <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold text-success">Active Items</div>
-                                                <small className="text-muted d-block">{totalPurchaseCost}</small>
+                                                <div className="fw-semibold">Below threshold</div>
+                                                <small className="text-muted d-block">{totalItems}</small>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-3 mb-3 mb-md-0">
+                                            <div className="p-3 bg-light rounded-4 shadow-sm">
+                                                <div className="fw-semibold text-success">Above threshold</div>
+                                                <small className="text-muted d-block">{categoriesCount}</small>
                                             </div>
                                         </div>
                                         <div className="col-md-3">
                                             <div className="p-3 bg-light rounded-4 shadow-sm">
-                                                <div className="fw-semibold text-warning">Inactive Items</div>
-                                                <small className="text-muted d-block">{categoriesCount}</small>
+                                                <div className="fw-semibold text-warning">Total cost</div>
+                                                <small className="text-muted d-block"> {totalPurchaseCost}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -325,14 +392,25 @@ const Purchase = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <button
-                                                        className={`btn btn-sm ${
-                                                            item.status === "active" ? "btn-outline-success" : "btn-outline-warning"
-                                                        }`}
-                                                        onClick={() => openEditItemModal(item)}
-                                                    >
-                                                        <i className="bi bi-pencil me-1"></i>
-                                                    </button>
+                                                    <div className="d-flex gap-1">
+                                                        {/* Edit button */}
+                                                        <button
+                                                            className="btn btn-sm btn-danger btn-outline-warning"
+                                                            onClick={() => openEditItemModal(item)}
+                                                        >
+                                                            <i className="bi bi-pencil"></i>
+                                                        </button>
+
+                                                        {/* Remove/Delete button */}
+                                                        <button
+                                                            className="btn btn-sm btn-outline-danger"
+                                                            onClick={() => handleRemoveItem(item.id)}
+                                                            title="Remove Item"
+                                                        >
+                                                            <i className="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+
                                                 </li>
                                             ))}
                                         </ul>
@@ -442,7 +520,7 @@ const Purchase = () => {
 
                                     {/* Header */}
                                     <div className="modal-header border-0">
-                                        <h5 className="modal-title fw-bold">Add New Item</h5>
+                                        <h5 className="modal-title fw-bold">Add Bucket</h5>
                                         <button
                                             type="button"
                                             className="btn-close"
@@ -453,49 +531,118 @@ const Purchase = () => {
                                     {/* Body */}
                                     <div className="modal-body">
 
-                                        {/* Image Upload */}
                                         <div className="mb-4 text-center">
-                                            <label className="d-block fw-semibold mb-2">Item Image</label>
 
                                             <div
                                                 className="border rounded-4 p-4 bg-light d-flex flex-column justify-content-center align-items-center"
-                                                style={{ height: "180px", cursor: "pointer" }}
                                             >
-                                                <i className="bi bi-image fs-1 text-secondary"></i>
-                                                <small className="text-muted">Click to upload image</small>
+                                                {imagePreview ? (
+                                                    <img
+                                                        src={imagePreview}
+                                                        alt="Preview"
+                                                        className="img-fluid rounded-3"
+                                                        style={{ maxHeight: "140px" }}
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <i className="bi bi-image fs-1 text-secondary"></i>
+                                                        <small className="text-muted">No image for this item</small>
+                                                    </>
+                                                )}
 
                                                 <input
+                                                    id="itemImageInput"
                                                     type="file"
                                                     accept="image/*"
-                                                    className="form-control mt-3"
-                                                    style={{ maxWidth: "250px" }}
+                                                    className="d-none"
+                                                    onChange={handleImageChange}
                                                 />
                                             </div>
                                         </div>
 
                                         <div className="row g-3">
 
-                                            {/* Item Name */}
-                                            <div className="col-md-6">
-                                                <label className="fw-semibold mb-1">Item Name</label>
+                                            <div className="col-md-12 position-relative">
                                                 <input
                                                     type="text"
                                                     className="form-control rounded-3"
+                                                    placeholder="Search item..."
+                                                    value={searchKeyword}
+                                                    onChange={(e) => setSearchKeyword(e.target.value)}
                                                 />
+
+                                                {suggestions.length > 0 && (
+                                                    <ul
+                                                        className="list-group position-absolute w-100 shadow"
+                                                        style={{ zIndex: 1050, maxHeight: "200px", overflowY: "auto" }}
+                                                    >
+                                                        {suggestions.map((s, idx) => (
+                                                            <li
+                                                                key={idx}
+                                                                className="list-group-item list-group-item-action"
+                                                                onMouseDown={() => handleSelectItem(s)}
+                                                                style={{ cursor: "pointer" }}
+                                                            >
+                                                                <strong>{s.item}</strong>
+                                                                <small className="text-muted ms-2">
+                                                                    ({s.category})
+                                                                </small>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
                                             </div>
+
 
                                             {/* Category */}
                                             <div className="col-md-6">
-                                                <label className="fw-semibold mb-1">Category</label>
-                                                <select className="form-select rounded-3" defaultValue="">
-                                                    <option value="" disabled>
-                                                        Select Category
-                                                    </option>
-                                                    <option>Electronics</option>
-                                                    <option>Furniture</option>
-                                                    <option>Accessories</option>
-                                                    <option>Consumables</option>
-                                                </select>
+                                                {selectedCategory ? (
+                                                    <select
+                                                        className="form-select rounded-3"
+                                                        value={formData.unit}
+                                                        onChange={(e) =>
+                                                            setFormData({ ...formData, unit: e.target.value })
+                                                        }
+                                                    >
+                                                        <option value="" disabled>
+                                                            Select unit
+                                                        </option>
+                                                        {availableUnits.map((unit, idx) => (
+                                                            <option key={idx} value={unit}>
+                                                                {unit}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <select className="form-select rounded-3">
+                                                        <option value="" disabled={true} selected={true}>
+                                                            Select item first
+                                                        </option>
+                                                    </select>
+                                                )}
+                                            </div>
+
+
+
+
+                                            {/* Item Name */}
+                                            <div className="col-md-3">
+                                                <input
+                                                    type="number"
+                                                    className="form-control rounded-3"
+                                                    placeholder="Quantity"
+                                                    min={1}
+                                                />
+                                            </div>
+
+                                            {/* Item Name */}
+                                            <div className="col-md-3">
+                                                <input
+                                                    type="number"
+                                                    className="form-control rounded-3"
+                                                    placeholder="Price ..."
+                                                    min={1}
+                                                />
                                             </div>
 
                                         </div>
@@ -511,7 +658,7 @@ const Purchase = () => {
                                             Cancel
                                         </button>
                                         <button className="btn btn-primary rounded-pill px-4">
-                                            Save Item
+                                            Save
                                         </button>
                                     </div>
 
@@ -638,10 +785,10 @@ const Purchase = () => {
 
                                             {/* Item Name */}
                                             <div className="col-md-4">
-                                                <label className="fw-semibold mb-1">Item Name</label>
                                                 <input
                                                     type="number"
                                                     className="form-control rounded-3"
+                                                    placeholder="Price"
                                                     value={formData.unitPrice}
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, name: e.target.value })
@@ -651,10 +798,10 @@ const Purchase = () => {
 
                                             {/* Item Name */}
                                             <div className="col-md-4">
-                                                <label className="fw-semibold mb-1">Item Name</label>
                                                 <input
                                                     type="number"
                                                     className="form-control rounded-3"
+                                                    placeholder="Quantity"
                                                     value={formData.neededQty}
                                                     onChange={(e) =>
                                                         setFormData({ ...formData, name: e.target.value })
@@ -663,9 +810,8 @@ const Purchase = () => {
                                             </div>
 
                                             <div className="col-md-4">
-                                                <label className="fw-semibold mb-1">Category</label>
                                                 <select className="form-select rounded-3" defaultValue="">
-                                                    <option value="" disabled>
+                                                    <option value="" disabled selected={true}>
                                                         Select Unit
                                                     </option>
                                                     <option>Kilogram</option>
@@ -719,35 +865,6 @@ const Purchase = () => {
         </>
     );
 };
-
-const StatCard = ({ title, value, change, icon, color }) => (
-    <div className="col-xl-3 col-md-6">
-        <div className="card band-card h-100 shadow-sm">
-            <div className="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <p className="text-muted mb-1">{title}</p>
-                    <h3 className={`fw-bold text-${color}`}>{value}</h3>
-                    <small className="text-muted">{change}</small>
-                </div>
-                <div className="stat-icon fs-2 text-${color}">{icon}</div>
-            </div>
-        </div>
-    </div>
-);
-
-
-const Activity = ({ title, time, dot }) => (
-    <div className="activity-item d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <div className="fw-semibold">
-                {dot && <span className="activity-dot"></span>}
-                {title}
-            </div>
-            <small className="text-muted">{time}</small>
-        </div>
-        <Eye />
-    </div>
-);
 
 
 export default Purchase;
